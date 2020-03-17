@@ -28,6 +28,7 @@
     <ClCompile Include="Mouse\MouseClass.cpp" />
     <ClCompile Include="Mouse\MouseEvent.cpp" />
     <ClCompile Include="RenderWindow.cpp" />
+    <ClCompile Include="Graphics\Shaders.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StringConverter.cpp" />
     <ClCompile Include="WindowContainer.cpp" />
@@ -42,8 +43,27 @@
     <ClInclude Include="Mouse\MouseClass.h" />
     <ClInclude Include="Mouse\MouseEvent.h" />
     <ClInclude Include="RenderWindow.h" />
+    <ClInclude Include="Graphics\Shaders.h" />
     <ClInclude Include="StringConverter.h" />
+    <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="WindowContainer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="pixelshader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="vertexshader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

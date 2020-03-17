@@ -4,6 +4,9 @@ bool Graphics::Initialize(HWND hwnd, int width, int height) {
 	if (!InitializeDirectX(hwnd, width, height)) {
 		return false;
 	}
+	if (!InitilaizeShaders()) {
+		return false;
+	}
 	return true;
 }
 
@@ -81,6 +84,41 @@ bool Graphics::InitializeDirectX(HWND hwnd, int width, int height) {
 	}
 
 	this->deviceContext->OMSetRenderTargets(1, this->renderTargetView.GetAddressOf(), NULL);
+
+	// Create the view port
+	D3D11_VIEWPORT viewport;
+	ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = width;
+	viewport.Height = height;
+
+	// Set the viewport
+	this->deviceContext->RSSetViewports(1, &viewport);
+
+	return true;
+}
+
+bool Graphics::InitilaizeShaders()
+{
+	D3D11_INPUT_ELEMENT_DESC layout[] = {
+		{	"POSITION",
+			0,
+			DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT,
+			0,
+			0,
+			D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA,
+			0
+		}
+	};
+	UINT numElements = ARRAYSIZE(layout);
+
+	// Location seams to be with reference to solution/project location
+	if (!vertexshader.Initialize(this->device, L"vertexshader.cso", layout, numElements))
+		return false;
+	if (!pixelshader.Initialize(this->device, L"pixelshader.cso"))
+		return false;
 
 	return true;
 }
