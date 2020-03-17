@@ -7,6 +7,9 @@ bool Graphics::Initialize(HWND hwnd, int width, int height) {
 	if (!InitilaizeShaders()) {
 		return false;
 	}
+	if (!InitializeScene()) {
+		return false;
+	}
 	return true;
 }
 
@@ -14,6 +17,19 @@ void Graphics::RenderFrame()
 {
 	float bgcolor[] = { 0.0f, 0.0f, 1.0f, 1.0f };
 	this->deviceContext->ClearRenderTargetView(this->renderTargetView.Get(), bgcolor);
+
+	this->deviceContext->IASetInputLayout(this->vertexshader.GetInputLayout());
+	this->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
+	this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
+
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	this->deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+
+	this->deviceContext->Draw(3, 0);
+
 	this->swapchain->Present(1, NULL);
 }
 
@@ -110,7 +126,7 @@ bool Graphics::InitilaizeShaders()
 			0,
 			D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA,
 			0
-		}
+		},
 	};
 	UINT numElements = ARRAYSIZE(layout);
 
@@ -119,6 +135,36 @@ bool Graphics::InitilaizeShaders()
 		return false;
 	if (!pixelshader.Initialize(this->device, L"pixelshader.cso"))
 		return false;
+
+	return true;
+}
+
+bool Graphics::InitializeScene()
+{
+	Vertex v[] = {
+		Vertex(0.0f, -0.2f),
+		Vertex(-0.2f, 0.0f),
+		Vertex(0.2f, 0.0f),
+	};
+
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v);
+	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA vertexBufferData;
+	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+	vertexBufferData.pSysMem = v;
+
+	HRESULT hr = this->device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf());
+	if (FAILED(hr)) {
+		ErrorLogger::Log(hr, "Failed to create vertex buffer.");
+		return false;
+	}
 
 	return true;
 }
