@@ -20,14 +20,25 @@ bool RenderWindow::Initialize(
 
 	this->RegisterWindowClass();
 
+	int centerScreenX = GetSystemMetrics(SM_CXSCREEN) / 2 - this->width / 2;
+	int centerScreenY = GetSystemMetrics(SM_CYSCREEN) / 2 - this->height / 2;
+
+
+	RECT wr; // Window Rectangle
+	wr.left = centerScreenX;
+	wr.top = centerScreenY;
+	wr.right = wr.left +  this->width;
+	wr.bottom = wr.top + this->height;
+	AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+
 	this->handle = CreateWindowEx(0,
 		this->window_class_wide.c_str(),
 		this->window_title_wide.c_str(),
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		0, // Window X origin
-		0, // Window Y origin
-		this->width, // window width
-		this->height, // window height
+		wr.left, // Window X origin
+		wr.top, // Window Y origin
+		wr.right - wr.left, // window width
+		wr.bottom - wr.top, // window height
 		NULL, // Handle to the parent of this window. Since this is the first window it has no parent
 		NULL, // Handle to menu or child window identifier
 		this->hInstance, // Handle to instance of module to be used with this window
