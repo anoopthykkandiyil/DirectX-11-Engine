@@ -46,6 +46,7 @@
     <ClInclude Include="Graphics\Shaders.h" />
     <ClInclude Include="StringConverter.h" />
     <ClInclude Include="Graphics\Vertex.h" />
+    <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="WindowContainer.h" />
   </ItemGroup>
   <ItemGroup>

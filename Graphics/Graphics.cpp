@@ -27,18 +27,17 @@ void Graphics::RenderFrame()
 	this->deviceContext->VSSetShader(vertexshader.GetShader(), NULL, 0);
 	this->deviceContext->PSSetShader(pixelshader.GetShader(), NULL, 0);
 
-	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 
 	// Texture Square
 	this->deviceContext->PSSetShaderResources(0, 1, this->myTexture.GetAddressOf());
-	this->deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+	this->deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.StridePtr(), &offset);
 	this->deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	this->deviceContext->DrawIndexed(6, 0, 0);
 
 	//Draw Text
 	spriteBatch->Begin();
-	spriteFont->DrawString(spriteBatch.get(), L"Super Mario World", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+	spriteFont->DrawString(spriteBatch.get(), L"Super Mario Brothers", DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
 	spriteBatch->End();
 	
 	this->swapchain->Present(1, NULL);
@@ -252,20 +251,9 @@ bool Graphics::InitializeScene()
 		0, 2, 3,
 	};
 
-	D3D11_BUFFER_DESC vertexBufferDesc;
-	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v);
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA vertexBufferData;
-	ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
-	vertexBufferData.pSysMem = v;
-
-	HRESULT hr = this->device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, this->vertexBuffer.GetAddressOf());
+	HRESULT hr = this->vertexBuffer.Initialize(this->device.Get(), v, ARRAYSIZE(v));
 	if (FAILED(hr)) {
 		ErrorLogger::Log(hr, "Failed to create vertex buffer.");
 		return false;
